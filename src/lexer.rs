@@ -1,23 +1,34 @@
-use crate::alpwltgybe;
+#[derive(PartialEq)]
+pub enum GybeTkn
+{
+    NUM,
+    IDEN,
+
+    QUOTE,
+    SEMI,
+    PERIOD,
+
+    ILLEGAL
+}
 
 pub struct Token
 {
-    pub key: alpwltgybe::GybeTkn,
+    pub key: GybeTkn,
     pub value: String,
 }
 
-pub fn tkn_print(t: Token)
+pub fn _tkn_print(t: Token)
 {
     let s: &str;
 
     match t.key
     {
-        alpwltgybe::GybeTkn::NUM => s = "NUM",
-        alpwltgybe::GybeTkn::IDEN => s = "IDEN",
-        alpwltgybe::GybeTkn::QUOTE => s = "QUOTE",
-        alpwltgybe::GybeTkn::SEMI => s = "SEMI",
-        alpwltgybe::GybeTkn::PERIOD => s = "PERIOD",
-        alpwltgybe::GybeTkn::ILLEGAL => s = "ILLEGAL",
+        GybeTkn::NUM => s = "NUM",
+        GybeTkn::IDEN => s = "IDEN",
+        GybeTkn::QUOTE => s = "QUOTE",
+        GybeTkn::SEMI => s = "SEMI",
+        GybeTkn::PERIOD => s = "PERIOD",
+        GybeTkn::ILLEGAL => s = "ILLEGAL",
     }
 
     println!("{} | {}", s, t.value);
@@ -33,7 +44,7 @@ pub fn lex(contents: String) -> Vec<Token>
     let mut idx: usize = 0;
     while idx < chars.len()
     {  
-        let temp_key: alpwltgybe::GybeTkn;
+        let temp_key: GybeTkn;
         let mut temp_value: String = String::new();
 
         let next: char = chars[idx];
@@ -52,7 +63,7 @@ pub fn lex(contents: String) -> Vec<Token>
                 idx += 1;
             }
 
-            tokens.push(Token{key: alpwltgybe::GybeTkn::IDEN, value: temp_value});
+            tokens.push(Token{key: GybeTkn::IDEN, value: temp_value});
             continue;
         }
 
@@ -64,7 +75,7 @@ pub fn lex(contents: String) -> Vec<Token>
                 idx += 1;
             }
 
-            tokens.push(Token{key: alpwltgybe::GybeTkn::NUM, value: temp_value});
+            tokens.push(Token{key: GybeTkn::NUM, value: temp_value});
             continue;
         }
 
@@ -72,19 +83,19 @@ pub fn lex(contents: String) -> Vec<Token>
         {
             '\'' =>
             {
-                temp_key = alpwltgybe::GybeTkn::QUOTE;
+                temp_key = GybeTkn::QUOTE;
             }
             '﹔' =>
             {
-                temp_key = alpwltgybe::GybeTkn::SEMI;
+                temp_key = GybeTkn::SEMI;
             }
             '.' =>
             {
-                temp_key = alpwltgybe::GybeTkn::PERIOD;
+                temp_key = GybeTkn::PERIOD;
             }
             _ =>
             {
-                temp_key = alpwltgybe::GybeTkn::ILLEGAL;
+                temp_key = GybeTkn::ILLEGAL;
             }
         }      
 

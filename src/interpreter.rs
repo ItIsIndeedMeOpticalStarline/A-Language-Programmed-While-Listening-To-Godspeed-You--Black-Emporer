@@ -1,4 +1,3 @@
-use crate::alpwltgybe;
 use crate::lexer;
 use std::fmt::Write;
 
@@ -44,7 +43,7 @@ int main()
     std::stack<ArgWrap> stack;
                     ");
 
-    let mut expects: Vec<alpwltgybe::GybeTkn> = vec![alpwltgybe::GybeTkn::IDEN];
+    let mut expects: Vec<lexer::GybeTkn> = vec![lexer::GybeTkn::IDEN];
     let mut arg_counter: u64 = 0;
     let mut in_quote: bool = false;
     let mut var_counter: u64 = 0;
@@ -61,7 +60,7 @@ int main()
 
             match tokens[idx].key
             {
-                alpwltgybe::GybeTkn::NUM =>
+                lexer::GybeTkn::NUM =>
                 {
                     if curr_type.as_str() == "charms"
                     {
@@ -74,8 +73,8 @@ int main()
                         ", var_counter, arg_counter, tokens[idx].value, curr_type).unwrap();
                         program.push_str(temp.as_str());
 
-                        expects.push(alpwltgybe::GybeTkn::PERIOD);
-                        expects.push(alpwltgybe::GybeTkn::SEMI);
+                        expects.push(lexer::GybeTkn::PERIOD);
+                        expects.push(lexer::GybeTkn::SEMI);
                     }
                     else if curr_type.as_str() == "sub"
                     {
@@ -106,10 +105,10 @@ int main()
                             }
                         }
 
-                        expects.push(alpwltgybe::GybeTkn::SEMI);
+                        expects.push(lexer::GybeTkn::SEMI);
                     }
                 }
-                alpwltgybe::GybeTkn::IDEN =>
+                lexer::GybeTkn::IDEN =>
                 {
                     if tokens[idx].value.as_str() == "bite" ||
                         tokens[idx].value.as_str() == "nom" ||
@@ -151,7 +150,7 @@ int main()
                         ", var_counter, arg_counter, tokens[idx].value, curr_type).unwrap();
                         program.push_str(temp.as_str());
 
-                        if tokens[idx + 1].key == alpwltgybe::GybeTkn::QUOTE
+                        if tokens[idx + 1].key == lexer::GybeTkn::QUOTE
                         {
                             let mut temp: String = String::new();
                             write!(temp, "
@@ -163,46 +162,46 @@ int main()
 
                     if !in_quote
                     {
-                        expects.push(alpwltgybe::GybeTkn::IDEN);
-                        expects.push(alpwltgybe::GybeTkn::SEMI);
+                        expects.push(lexer::GybeTkn::IDEN);
+                        expects.push(lexer::GybeTkn::SEMI);
                     }
 
                     if curr_type.as_str() == "charms"
                     {
-                        expects.push(alpwltgybe::GybeTkn::NUM);
+                        expects.push(lexer::GybeTkn::NUM);
                     }
                     else if curr_type.as_str() == "sub"
                     {
-                        expects.push(alpwltgybe::GybeTkn::NUM);
+                        expects.push(lexer::GybeTkn::NUM);
                     }
                     else if curr_type.as_str() == "up" // Give up
                     {
                         expects.clear();
-                        expects.push(alpwltgybe::GybeTkn::SEMI)
+                        expects.push(lexer::GybeTkn::SEMI)
                     }
                 }
-                alpwltgybe::GybeTkn::QUOTE =>
+                lexer::GybeTkn::QUOTE =>
                 {
                     if in_quote
                     {
-                        expects.push(alpwltgybe::GybeTkn::PERIOD);
-                        expects.push(alpwltgybe::GybeTkn::SEMI);
+                        expects.push(lexer::GybeTkn::PERIOD);
+                        expects.push(lexer::GybeTkn::SEMI);
                         in_quote = false;   
                     }
                     else
                     {
-                        expects.push(alpwltgybe::GybeTkn::IDEN);
-                        expects.push(alpwltgybe::GybeTkn::NUM);
-                        expects.push(alpwltgybe::GybeTkn::QUOTE);
+                        expects.push(lexer::GybeTkn::IDEN);
+                        expects.push(lexer::GybeTkn::NUM);
+                        expects.push(lexer::GybeTkn::QUOTE);
                         in_quote = true;
                     }
                 }
-                alpwltgybe::GybeTkn::SEMI =>
+                lexer::GybeTkn::SEMI =>
                 {
-                    if (tokens[idx - 1].key == alpwltgybe::GybeTkn::NUM &&
-                        tokens[idx - 2].key != alpwltgybe::GybeTkn::IDEN) ||
-                        (tokens[idx - 1].key == alpwltgybe::GybeTkn::QUOTE &&
-                        tokens[idx - 2].key == alpwltgybe::GybeTkn::IDEN)
+                    if (tokens[idx - 1].key == lexer::GybeTkn::NUM &&
+                        tokens[idx - 2].key != lexer::GybeTkn::IDEN) ||
+                        (tokens[idx - 1].key == lexer::GybeTkn::QUOTE &&
+                        tokens[idx - 2].key == lexer::GybeTkn::IDEN)
                     {
                         let mut temp: String = String::new();
                         write!(temp, "
@@ -210,14 +209,14 @@ int main()
                         ", var_counter).unwrap();
                         program.push_str(temp.as_str());
                     }
-                    expects.push(alpwltgybe::GybeTkn::IDEN);
+                    expects.push(lexer::GybeTkn::IDEN);
                 }
-                alpwltgybe::GybeTkn::PERIOD =>
+                lexer::GybeTkn::PERIOD =>
                 {
-                    expects.push(alpwltgybe::GybeTkn::NUM);
-                    expects.push(alpwltgybe::GybeTkn::IDEN);
+                    expects.push(lexer::GybeTkn::NUM);
+                    expects.push(lexer::GybeTkn::IDEN);
                 }
-                alpwltgybe::GybeTkn::ILLEGAL => // ERROR
+                lexer::GybeTkn::ILLEGAL => // ERROR
                 {
 
                 }
