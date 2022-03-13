@@ -1,6 +1,7 @@
 use std::path::Path;
 
-mod interpreter;
+mod c_code;
+mod translator;
 mod lexer;
 
 fn main() 
@@ -22,7 +23,7 @@ fn main()
 
     let vec: std::vec::Vec<lexer::Token> = lexer::lex(contents.unwrap());
 
-    let c_code: String = interpreter::interpret(vec);
+    let c_code: String = translator::translate(vec);
 
     println!("\n{} successfully compiled!", file_path.display());
     println!("Please enter an output path (Ex: C:\\Users\\Jackie\\Desktop)\n");

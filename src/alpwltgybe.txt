@@ -9,24 +9,21 @@
 
 - charms represents an array of characters
 
+- print: pops then prints the top value of the stack
+- comp: pops then compares the top two values of the stack if the top value is not an array. Pushes a zero if they are equal and a one if they are not
+- swap: swaps the top two values on the stack
 - sub: represents a subroutine
-- comp: represents an eval ? 1 : 0
 - loop: represents a while value != 0
 - end: ends the loop or subroutine
-- name: names an index on the stack
+- dup: duplicates the top value on the stack
+- sum: pops then adds the top two values of the stack if they are not charms
+- difference: pops then subtracts the top two values of the stack if they are not charms
+- product: pops then multiplies the top two values of the stack if they are not charms
+- quotient: pops then divides the top two values of the stack if they are not charms
+- remainder: pops the mods the top two values of the stack if they are not charms
 - skip: skips x number of instructions if the top value of the stack is equal to zero
-- flip: reverses the stack
+- read: reads user input and pushes it onto the stack as a charms array
 - give up: ends the program
 
         --::STANDARD::--
 - sub -1: used by the interpreter. if you use this your program will not compile
-    
-- sub 0: pops then prints the top value on the stack as an ascii character
-- sub 1: pops then prints the top value on the stack as a number
-- sub 2: pops then prints the top value on the stack if it is a charms
-
-- sub 5: pops then sums the top two values on the stack (val2 + val1) and places a single value back on the stack
-- sub 6: pops then subtracts the top two values on the stack (val2 - val1) and places a single value back on the stack
-- sub 7: pops then multiplies the top two values on the stack (val2 * val1) and places a single value back on the stack
-- sub 8: pops then divides the top two values on the stack (val2 / val1) and places a single value back on the stack
-- sub 9: pops then mods the top two values on the stack (val2 % val1) and places a single value back on the stack
