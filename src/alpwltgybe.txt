@@ -1,14 +1,11 @@
    ALBWLTGY-BE Specifications:
 
         --::TYPES::--
-- bite represents an 8 bit integer
-- nom represents a 16 bit integer
-- chomp represents a 32 bit integer
+- bite represents an 8 bit integer or array of integers
 
-- drift represents a 32 bit float
+- charms represents a char or array of chars
 
-- charms represents an array of characters
-
+        --::COMMANDS::--
 - print: pops then prints the top value of the stack
 - comp: pops then compares the top two values of the stack if the top value is not an array. Pushes a zero if they are equal and a one if they are not
 - swap: swaps the top two values on the stack
@@ -24,6 +21,3 @@
 - skip: skips x number of instructions if the top value of the stack is equal to zero
 - read: reads user input and pushes it onto the stack as a charms array
 - give up: ends the program
-
-        --::STANDARD::--
-- sub -1: used by the interpreter. if you use this your program will not compile

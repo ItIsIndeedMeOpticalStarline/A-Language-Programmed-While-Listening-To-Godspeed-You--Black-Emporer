@@ -1,6 +1,8 @@
 use crate::lexer;
 use crate::c_code;
 
+use std::collections::VecDeque;
+
 // This is really messy if someone wants to clean it up go ahead but that's not gonna be my job
 
 pub fn translate(tokens: Vec<lexer::Token>) -> String
@@ -9,17 +11,29 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
     program.push_str(c_code::get_begin_string().as_str());
 
     let mut expects: Vec<lexer::GybeTkn> = vec![lexer::GybeTkn::IDEN];
+    let mut types: VecDeque<&String> = VecDeque::new();
 
     let mut var_counter: u64 = 0;                   // Used for variable naming
     let mut in_quote: bool = false;
-    let mut curr_type: &String = &String::new();    // Current type the translator is working with
-    let mut top_idx: usize = 0;                     // Index to the token at the top of the C++ stack
 
     let mut idx: usize = 0;
     while idx < tokens.len()
     {
         let prev: &lexer::Token;
         let curr: &lexer::Token = &tokens[idx];
+
+        let curr_type: &String;
+
+        if types.len() > 0
+        {
+            curr_type = &types[0];
+        }
+        else
+        {
+            types.push_front(&curr.value);
+            curr_type = &types[0];
+        }
+
 
         if idx > 0
         {
@@ -52,10 +66,6 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                     {
                         match curr.value.parse::<i32>().unwrap_or(-1)
                         {
-                            -1 => // ERROR
-                            {
-                                return String::new();
-                            }
                             _ =>
                             {
 
@@ -69,7 +79,6 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 {
                     if !in_quote
                     {
-                        curr_type = &curr.value;
                     }
 
                     if in_quote
@@ -77,17 +86,14 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         program.push_str(c_code::get_arg_string(var_counter, &curr.value, curr_type).as_str());
                         expects.push(lexer::GybeTkn::QUOTE);
                     }
-                    else if curr_type.as_str() == "bite" ||
-                        curr_type.as_str() == "nom" ||
-                        curr_type.as_str() == "chomp" ||
-                        curr_type.as_str() == "drift" ||
-                        curr_type.as_str() == "charms"
+                    else if curr.value.as_str() == "bite" ||
+                        curr.value.as_str() == "charms"
                     {
                         var_counter += 1; 
-                        top_idx = idx;
-                        program.push_str(c_code::get_arg_wrap_string(var_counter, curr_type).as_str());  
-                        
-                        if curr_type.as_str() == "charms"
+                        types.push_front(&curr.value);
+                        program.push_str(c_code::get_arg_wrap_string(var_counter).as_str());  
+
+                        if curr.value.as_str() == "charms"
                         {
                             expects.push(lexer::GybeTkn::NUM);
                         }
@@ -98,74 +104,105 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                             expects.push(lexer::GybeTkn::SEMI);
                         }
                     }
-                    else if curr_type.as_str() == "dup"
+                    else if curr.value.as_str() == "dup"
                     {
+                        types.push_front(curr_type);
+
                         program.push_str(c_code::get_dup_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "print"
+                    else if curr.value.as_str() == "print"
                     {
-                        program.push_str(c_code::get_print_string(&tokens[top_idx].value).as_str());
+                        types.pop_front();
+
+                        program.push_str(c_code::get_print_string(curr_type).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "sub"
+                    else if curr.value.as_str() == "sub"
                     {
                         expects.push(lexer::GybeTkn::NUM);
                     }
-                    else if curr_type.as_str() == "give"
+                    else if curr.value.as_str() == "give"
                     {
                         expects.push(lexer::GybeTkn::IDEN);
                     }
-                    else if curr_type.as_str() == "up"
+                    else if curr.value.as_str() == "up"
                     {
                         program.push_str(c_code::get_return_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "end"
+                    else if curr.value.as_str() == "end"
                     {
                         program.push_str(c_code::get_end_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "loop"
+                    else if curr.value.as_str() == "loop"
                     {
-                        if tokens[top_idx].value != "charms" // Declaration type
+                        if curr_type != "charms" // Declaration type
                         {
-                            program.push_str(c_code::get_while_string(&tokens[top_idx].value).as_str())
+                            program.push_str(c_code::get_while_string().as_str())
                         }
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "sum"
+                    else if curr.value.as_str() == "sum"
                     {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
                         var_counter += 1; 
-                        program.push_str(c_code::get_sum_string(var_counter, &tokens[top_idx].value).as_str());
+                        program.push_str(c_code::get_sum_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "difference"
+                    else if curr.value.as_str() == "difference"
                     {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
                         var_counter += 1; 
-                        program.push_str(c_code::get_difference_string(var_counter, &tokens[top_idx].value).as_str());
+                        program.push_str(c_code::get_difference_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "product"
+                    else if curr.value.as_str() == "product"
                     {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
                         var_counter += 1; 
-                        program.push_str(c_code::get_product_string(var_counter, &tokens[top_idx].value).as_str());
+                        program.push_str(c_code::get_product_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "quotient"
+                    else if curr.value.as_str() == "quotient"
                     {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
                         var_counter += 1; 
-                        program.push_str(c_code::get_quotient_string(var_counter, &tokens[top_idx].value).as_str());
+                        program.push_str(c_code::get_quotient_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "remainder"
+                    else if curr.value.as_str() == "remainder"
                     {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
                         var_counter += 1; 
-                        program.push_str(c_code::get_remainder_string(var_counter, &tokens[top_idx].value).as_str());
+                        program.push_str(c_code::get_remainder_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "swap"
+                    else if curr.value.as_str() == "swap"
                     {
+                        let a: &String = curr_type;
+                        types.pop_front();
+                        let b: &String = curr_type;
+                        types.pop_front();
+                        types.push_front(a);
+                        types.push_front(b);
+
                         program.push_str(c_code::get_swap_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
@@ -204,13 +241,18 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 }
                 lexer::GybeTkn::ILLEGAL => // ERROR
                 {
-
+                    println!("ILLEGAL ACTION: {}", &curr.value);
+                    return String::new();
                 }
             }
         }
         else // ERROR
         {
-            return String::new();
+            for tkn in &expects
+            {
+                println!("COMPILATION FAILED: expected {:?}, found {:?}", tkn , &curr.key);
+                return String::new();
+            }
         }
         idx += 1;
     }
