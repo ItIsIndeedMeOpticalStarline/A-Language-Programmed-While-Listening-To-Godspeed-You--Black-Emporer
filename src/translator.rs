@@ -104,6 +104,16 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                             expects.push(lexer::GybeTkn::SEMI);
                         }
                     }
+                    else if curr.value.as_str() == "comp"
+                    {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
+                        var_counter += 1; 
+                        program.push_str(c_code::get_comp_string(var_counter).as_str());
+                        expects.push(lexer::GybeTkn::SEMI);
+                    }
                     else if curr.value.as_str() == "dup"
                     {
                         types.push_front(curr_type);

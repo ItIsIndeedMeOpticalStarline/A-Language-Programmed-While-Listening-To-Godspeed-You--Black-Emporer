@@ -9,7 +9,7 @@
 - print: pops then prints the top value of the stack
 - comp: pops then compares the top two values of the stack if the top value is not an array. Pushes a zero if they are equal and a one if they are not
 - swap: swaps the top two values on the stack
-- sub: represents a subroutine
+- (UNIMPLEMENTED) sub: represents a subroutine
 - loop: represents a while value != 0
 - end: ends the loop or subroutine
 - dup: duplicates the top value on the stack
@@ -18,6 +18,6 @@
 - product: pops then multiplies the top two values of the stack if they are not charms
 - quotient: pops then divides the top two values of the stack if they are not charms
 - remainder: pops the mods the top two values of the stack if they are not charms
-- skip: skips x number of instructions if the top value of the stack is equal to zero
-- read: reads user input and pushes it onto the stack as a charms array
+- (UNIMPLEMENTED) skip: skips x number of instructions if the top value of the stack is equal to zero
+- (UNIMPLEMENTED) read: reads user input and pushes it onto the stack as a charms or charms array
 - give up: ends the program

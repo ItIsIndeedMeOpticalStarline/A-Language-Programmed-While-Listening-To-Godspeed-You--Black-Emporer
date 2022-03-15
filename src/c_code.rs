@@ -26,7 +26,7 @@ pub fn get_arg_wrap_string(num_vars: u64) -> String
 
     write!(arg_wrap_string, "
     ArgWrap var{0};
-    ", num_vars).expect("get_arg_wrap_string(u64, &String) failed");
+    ", num_vars).expect("get_arg_wrap_string(u64) failed");
 
     return arg_wrap_string;
 }
@@ -66,6 +66,23 @@ pub fn get_begin_string() -> String
     return begin_string;
 }
 
+pub fn get_comp_string(num_vars: u64) -> String
+{
+    let mut comp_string: String = String::new();
+
+    write!(comp_string, "
+    ArgWrap var{0};
+    regA = stack.top();
+    stack.pop();
+    regB = stack.top();
+    stack.pop();
+    var{0}.a.push_back((regA.a.at(0) == regB.a.at(0)) ? 1 : 0);
+    stack.push(var{0});
+    ", num_vars).expect("get_comp_string(u64) failed");
+
+    return comp_string;
+}
+
 pub fn get_difference_string(num_vars: u64) -> String
 {
     let mut difference_string: String = String::new();
@@ -91,7 +108,7 @@ pub fn get_difference_string(num_vars: u64) -> String
         }}
     }}
     stack.push(var{0});
-    ", num_vars).expect("get_difference_string(u64, &String) failed");
+    ", num_vars).expect("get_difference_string(u64) failed");
 
     return difference_string;
 }
@@ -178,7 +195,7 @@ pub fn get_product_string(num_vars: u64) -> String
         }}
     }}
     stack.push(var{0});
-    ", num_vars).expect("get_product_string(u64, &String) failed");
+    ", num_vars).expect("get_product_string(u64) failed");
 
     return product_string;
 }
@@ -208,7 +225,7 @@ pub fn get_quotient_string(num_vars: u64) -> String
         }}
     }}
     stack.push(var{0});
-    ", num_vars).expect("get_quotient_string(u64, &String) failed");
+    ", num_vars).expect("get_quotient_string(u64) failed");
 
     return quotient_string;
 }
@@ -238,7 +255,7 @@ pub fn get_remainder_string(num_vars: u64) -> String
         }}
     }}
     stack.push(var{0});
-    ", num_vars).expect("get_remainder_string(u64, &String) failed");
+    ", num_vars).expect("get_remainder_string(u64) failed");
 
     return remainder_string;
 }
@@ -278,7 +295,7 @@ pub fn get_sum_string(num_vars: u64) -> String
         }}
     }}
     stack.push(var{0});
-    ", num_vars).expect("get_sum_string(u64, &String) failed");
+    ", num_vars).expect("get_sum_string(u64) failed");
 
     return sum_string;
 }
@@ -305,7 +322,7 @@ pub fn get_while_string() -> String
     assert(stack.top().a.size() == 1);
     while (stack.top().a.at(0) != 0)
     {{
-    ").expect("get_while_string(&String) failed");
+    ").expect("get_while_string() failed");
 
     return while_string;
 }
