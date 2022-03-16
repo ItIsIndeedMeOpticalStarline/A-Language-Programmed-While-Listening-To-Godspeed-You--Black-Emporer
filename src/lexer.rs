@@ -18,6 +18,7 @@ pub struct Token
     pub value: String,
 }
 
+// Unused. Debugging method
 pub fn _tkn_print(t: Token)
 {
     let s: &str;
@@ -35,6 +36,7 @@ pub fn _tkn_print(t: Token)
     println!("{} | {}", s, t.value);
 }
 
+// This lexer is very simple, it dosen't have any logic to tokens and values and is just split by whitespace
 pub fn lex(contents: String) -> Vec<Token>
 {
     let mut tokens: Vec<Token> = Vec::new();

@@ -1,0 +1,20 @@
+bite 'd'﹔
+dup﹔dup﹔difference﹔
+swap﹔
+loop﹔
+	swap﹔
+	bite 'a'﹔
+	bite 'b'﹔
+	difference﹔
+	sum﹔
+	dup﹔print﹔
+	charms 10﹔
+	print﹔
+	swap﹔
+	bite 'a'﹔
+	bite 'b'﹔
+	difference﹔
+	swap﹔
+	difference﹔
+end﹔
+give up﹔

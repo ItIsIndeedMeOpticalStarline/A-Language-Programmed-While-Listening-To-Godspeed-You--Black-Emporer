@@ -5,6 +5,9 @@ use std::collections::VecDeque;
 
 // This is really messy if someone wants to clean it up go ahead but that's not gonna be my job
 
+// I understand that this is a pretty miserable way of code parsing, if you can even call it that.
+// The code here was written to be a fast hack-y implementation and not to be expandable, reuseable, or fast.
+
 pub fn translate(tokens: Vec<lexer::Token>) -> String
 {
     let mut program: String = String::new();
@@ -13,8 +16,10 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
     let mut expects: Vec<lexer::GybeTkn> = vec![lexer::GybeTkn::IDEN];
     let mut types: VecDeque<&String> = VecDeque::new();
 
-    let mut var_counter: u64 = 0;                   // Used for variable naming
+    let mut var_counter: u64 = 0; // Used for variable naming
     let mut in_quote: bool = false;
+
+    let charms_string: String = String::from("charms"); // I don't like having to do this but w/e
 
     let mut idx: usize = 0;
     while idx < tokens.len()
@@ -62,7 +67,7 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         expects.push(lexer::GybeTkn::PERIOD);
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "sub"
+                    else if curr_type.as_str() == "sub" // NOT FINISHED
                     {
                         match curr.value.parse::<i32>().unwrap_or(-1)
                         {
@@ -77,10 +82,6 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 }
                 lexer::GybeTkn::IDEN =>
                 {
-                    if !in_quote
-                    {
-                    }
-
                     if in_quote
                     {
                         program.push_str(c_code::get_arg_string(var_counter, &curr.value, curr_type).as_str());
@@ -148,10 +149,10 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                     }
                     else if curr.value.as_str() == "loop"
                     {
-                        if curr_type != "charms" // Declaration type
-                        {
-                            program.push_str(c_code::get_while_string().as_str())
-                        }
+                        //if curr_type != "charms" // Declaration type
+                        //{
+                            program.push_str(c_code::get_while_string().as_str());
+                        //}
                         expects.push(lexer::GybeTkn::SEMI);
                     }
                     else if curr.value.as_str() == "sum"
@@ -192,6 +193,14 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
 
                         var_counter += 1; 
                         program.push_str(c_code::get_quotient_string(var_counter).as_str());
+                        expects.push(lexer::GybeTkn::SEMI);
+                    }
+                    else if curr.value.as_str() == "read"
+                    {
+                        types.push_front(&charms_string);
+
+                        var_counter += 1;
+                        program.push_str(c_code::get_read_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
                     else if curr.value.as_str() == "remainder"
@@ -235,8 +244,7 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 }
                 lexer::GybeTkn::SEMI =>
                 {
-                    if (prev.key == lexer::GybeTkn::NUM &&
-                        tokens[idx - 2].key != lexer::GybeTkn::IDEN) ||
+                    if prev.key == lexer::GybeTkn::NUM ||
                         (prev.key == lexer::GybeTkn::QUOTE &&
                         tokens[idx - 2].key == lexer::GybeTkn::IDEN)
                     {

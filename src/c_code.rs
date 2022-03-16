@@ -1,5 +1,7 @@
 use std::fmt::Write;
 
+// !!! NEVER DO THIS FOR YOUR LANGUAGE, IT IS MUCH HARDER TO WRITE AND USE. MAKE AN INTERPRETER INSTEAD !!!
+
 pub fn get_arg_string(num_vars: u64, arg_value: &String, arg_type: &String) -> String
 {
     let mut arg_string: String = String::new();
@@ -57,6 +59,8 @@ pub fn get_begin_string() -> String
 
     ArgWrap regA;
     ArgWrap regB;
+
+    std::string ioReg;
 
     int main()
     {
@@ -228,6 +232,23 @@ pub fn get_quotient_string(num_vars: u64) -> String
     ", num_vars).expect("get_quotient_string(u64) failed");
 
     return quotient_string;
+}
+
+pub fn get_read_string(num_vars: u64) -> String
+{
+    let mut read_string: String = String::new();
+
+    write!(read_string, "
+    ArgWrap var{0};
+    std::getline(std::cin, ioReg);
+    for (size_t i = 0; i < ioReg.size(); i++)
+    {{
+        var{0}.a.push_back((int8_t)ioReg[i]);
+    }}
+    stack.push(var{0});
+    ", num_vars).expect("get_read_string(u64) failed");
+
+    return read_string;
 }
 
 pub fn get_remainder_string(num_vars: u64) -> String

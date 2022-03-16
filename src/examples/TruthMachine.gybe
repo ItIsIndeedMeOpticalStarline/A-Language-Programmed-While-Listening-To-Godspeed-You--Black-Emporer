@@ -1,0 +1,15 @@
+charms 48﹔
+read﹔
+difference﹔
+loop﹔
+	charms 48﹔
+	sum﹔
+	dup﹔print﹔
+	charms 48﹔
+	swap﹔
+	difference﹔
+end﹔
+charms 48﹔
+sum﹔
+print﹔
+give up﹔

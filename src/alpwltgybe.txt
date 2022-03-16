@@ -19,5 +19,5 @@
 - quotient: pops then divides the top two values of the stack if they are not charms
 - remainder: pops the mods the top two values of the stack if they are not charms
 - (UNIMPLEMENTED) skip: skips x number of instructions if the top value of the stack is equal to zero
-- (UNIMPLEMENTED) read: reads user input and pushes it onto the stack as a charms or charms array
+- read: reads user input and pushes it onto the stack as a charms or charms array
 - give up: ends the program
