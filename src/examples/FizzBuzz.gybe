@@ -2,19 +2,155 @@ bite 'd'﹔
 dup﹔dup﹔difference﹔
 swap﹔
 loop﹔
+	bite 'a'﹔bite 'b'﹔difference﹔
 	swap﹔
-	bite 'a'﹔
-	bite 'b'﹔
 	difference﹔
+	swap﹔
+	bite 'a'﹔bite 'b'﹔difference﹔
 	sum﹔
+	dup﹔
+	bite 'a'﹔bite 'd'﹔difference﹔
+	swap﹔
+	remainder﹔
+	skip 'A'﹔
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	charms 70. 105. 122. 122﹔
+	print﹔
+	
+	dup﹔
+	bite 'a'﹔bite 'f'﹔difference﹔
+	swap﹔
+	remainder﹔
+	skip 'A'﹔
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	charms 66. 117. 122. 122﹔
+	print﹔
+	
 	dup﹔print﹔
 	charms 10﹔
 	print﹔
 	swap﹔
-	bite 'a'﹔
-	bite 'b'﹔
-	difference﹔
-	swap﹔
-	difference﹔
 end﹔
 give up﹔

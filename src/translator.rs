@@ -8,6 +8,12 @@ use std::collections::VecDeque;
 // I understand that this is a pretty miserable way of code parsing, if you can even call it that.
 // The code here was written to be a fast hack-y implementation and not to be expandable, reuseable, or fast.
 
+pub struct Label
+{
+    idx: u64,
+    lin: u64
+}
+
 pub fn translate(tokens: Vec<lexer::Token>) -> String
 {
     let mut program: String = String::new();
@@ -15,8 +21,12 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
 
     let mut expects: Vec<lexer::GybeTkn> = vec![lexer::GybeTkn::IDEN];
     let mut types: VecDeque<&String> = VecDeque::new();
+    let mut subs: Vec<i32> = Vec::new();
+    let mut labels: Vec<Label> = Vec::new();
 
+    let mut lbl_counter: u64 = 0; // Used for label naming
     let mut var_counter: u64 = 0; // Used for variable naming
+
     let mut in_quote: bool = false;
 
     let charms_string: String = String::from("charms"); // I don't like having to do this but w/e
@@ -49,6 +59,8 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
             prev = &tokens[idx];
         }
 
+        expects.push(lexer::GybeTkn::NEWLIN);
+        expects.push(lexer::GybeTkn::ILLEGAL);
         if expects.contains(&curr.key)
         {
             if idx != 0
@@ -67,14 +79,17 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         expects.push(lexer::GybeTkn::PERIOD);
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr_type.as_str() == "sub" // NOT FINISHED
+                    else if prev.value.as_str() == "sub" // NOT FINISHED
                     {
-                        match curr.value.parse::<i32>().unwrap_or(-1)
-                        {
-                            _ =>
-                            {
+                        let sub_key = curr.value.parse::<i32>().unwrap_or(-1);
 
-                            }
+                        if subs.contains(&sub_key)
+                        {
+
+                        }
+                        else
+                        {
+                            subs.push(sub_key);
                         }
 
                         expects.push(lexer::GybeTkn::SEMI);
@@ -84,7 +99,16 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 {
                     if in_quote
                     {
-                        program.push_str(c_code::get_arg_string(var_counter, &curr.value, curr_type).as_str());
+                        if tokens.len() > 2 && tokens[idx - 2].value.as_str() == "skip"
+                        {
+                            lbl_counter += 1;
+                            labels.push(Label { idx: lbl_counter, lin: curr.value.chars().nth(0).unwrap() as u64 });
+                            program.push_str(c_code::get_skip_string(lbl_counter).as_str());
+                        } 
+                        else
+                        {
+                            program.push_str(c_code::get_arg_string(var_counter, &curr.value, curr_type).as_str());
+                        }
                         expects.push(lexer::GybeTkn::QUOTE);
                     }
                     else if curr.value.as_str() == "bite" ||
@@ -115,6 +139,16 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         program.push_str(c_code::get_comp_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
+                    else if curr.value.as_str() == "difference"
+                    {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
+                        var_counter += 1; 
+                        program.push_str(c_code::get_difference_string(var_counter).as_str());
+                        expects.push(lexer::GybeTkn::SEMI);
+                    }
                     else if curr.value.as_str() == "dup"
                     {
                         types.push_front(curr_type);
@@ -122,30 +156,14 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         program.push_str(c_code::get_dup_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr.value.as_str() == "print"
-                    {
-                        types.pop_front();
-
-                        program.push_str(c_code::get_print_string(curr_type).as_str());
-                        expects.push(lexer::GybeTkn::SEMI);
-                    }
-                    else if curr.value.as_str() == "sub"
-                    {
-                        expects.push(lexer::GybeTkn::NUM);
-                    }
-                    else if curr.value.as_str() == "give"
-                    {
-                        expects.push(lexer::GybeTkn::IDEN);
-                    }
-                    else if curr.value.as_str() == "up"
-                    {
-                        program.push_str(c_code::get_return_string().as_str());
-                        expects.push(lexer::GybeTkn::SEMI);
-                    }
                     else if curr.value.as_str() == "end"
                     {
                         program.push_str(c_code::get_end_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
+                    }
+                    else if curr.value.as_str() == "give"
+                    {
+                        expects.push(lexer::GybeTkn::IDEN);
                     }
                     else if curr.value.as_str() == "loop"
                     {
@@ -155,24 +173,11 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         //}
                         expects.push(lexer::GybeTkn::SEMI);
                     }
-                    else if curr.value.as_str() == "sum"
+                    else if curr.value.as_str() == "print"
                     {
-                        types.push_front(curr_type); // Reverse order here
-                        types.pop_front();
                         types.pop_front();
 
-                        var_counter += 1; 
-                        program.push_str(c_code::get_sum_string(var_counter).as_str());
-                        expects.push(lexer::GybeTkn::SEMI);
-                    }
-                    else if curr.value.as_str() == "difference"
-                    {
-                        types.push_front(curr_type); // Reverse order here
-                        types.pop_front();
-                        types.pop_front();
-
-                        var_counter += 1; 
-                        program.push_str(c_code::get_difference_string(var_counter).as_str());
+                        program.push_str(c_code::get_print_string(curr_type).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
                     else if curr.value.as_str() == "product"
@@ -213,6 +218,24 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         program.push_str(c_code::get_remainder_string(var_counter).as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
+                    else if curr.value.as_str() == "skip"
+                    {
+                        expects.push(lexer::GybeTkn::QUOTE);
+                    }
+                    else if curr.value.as_str() == "sub"
+                    {
+                        expects.push(lexer::GybeTkn::NUM);
+                    }
+                    else if curr.value.as_str() == "sum"
+                    {
+                        types.push_front(curr_type); // Reverse order here
+                        types.pop_front();
+                        types.pop_front();
+
+                        var_counter += 1; 
+                        program.push_str(c_code::get_sum_string(var_counter).as_str());
+                        expects.push(lexer::GybeTkn::SEMI);
+                    }
                     else if curr.value.as_str() == "swap"
                     {
                         let a: &String = curr_type;
@@ -223,6 +246,11 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                         types.push_front(b);
 
                         program.push_str(c_code::get_swap_string().as_str());
+                        expects.push(lexer::GybeTkn::SEMI);
+                    }
+                    else if curr.value.as_str() == "up"
+                    {
+                        program.push_str(c_code::get_return_string().as_str());
                         expects.push(lexer::GybeTkn::SEMI);
                     }
                 }
@@ -244,9 +272,10 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 }
                 lexer::GybeTkn::SEMI =>
                 {
-                    if prev.key == lexer::GybeTkn::NUM ||
+                    if (prev.key == lexer::GybeTkn::NUM ||
                         (prev.key == lexer::GybeTkn::QUOTE &&
-                        tokens[idx - 2].key == lexer::GybeTkn::IDEN)
+                        tokens[idx - 2].key == lexer::GybeTkn::IDEN)) &&
+                        tokens[idx - 4].value.as_str() != "skip"
                     {
                         program.push_str(c_code::get_push_string(var_counter).as_str());
                     }
@@ -254,6 +283,29 @@ pub fn translate(tokens: Vec<lexer::Token>) -> String
                 }
                 lexer::GybeTkn::PERIOD =>
                 {
+                    expects.push(lexer::GybeTkn::NUM);
+                    expects.push(lexer::GybeTkn::IDEN);
+                }
+                lexer::GybeTkn::NEWLIN =>
+                {
+                    if labels.len() > 0
+                    {
+                        let mut lbl_idx: usize = 0; 
+                        while lbl_idx < labels.len() // While loop is used to not break loop when removing elements
+                        {
+                            if labels[lbl_idx].lin > 0
+                            {
+                                labels[lbl_idx].lin -= 1;
+                            }
+                            else
+                            {
+                                program.push_str(c_code::get_label_string(labels[lbl_idx].idx as u64).as_str());
+                                labels.remove(lbl_idx);
+                                continue;
+                            }
+                            lbl_idx += 1;
+                        } 
+                    }
                     expects.push(lexer::GybeTkn::NUM);
                     expects.push(lexer::GybeTkn::IDEN);
                 }

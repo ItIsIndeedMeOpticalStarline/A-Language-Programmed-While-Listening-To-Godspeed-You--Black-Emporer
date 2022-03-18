@@ -9,6 +9,7 @@ pub enum GybeTkn
     SEMI,
     PERIOD,
 
+    NEWLIN,
     ILLEGAL
 }
 
@@ -30,7 +31,8 @@ pub fn _tkn_print(t: Token)
         GybeTkn::QUOTE => s = "QUOTE",
         GybeTkn::SEMI => s = "SEMI",
         GybeTkn::PERIOD => s = "PERIOD",
-        GybeTkn::ILLEGAL => s = "ILLEGAL",
+        GybeTkn::NEWLIN => s = "NEWLIN",
+        GybeTkn::ILLEGAL => s = "ILLEGAL"
     }
 
     println!("{} | {}", s, t.value);
@@ -41,8 +43,7 @@ pub fn lex(contents: String) -> Vec<Token>
 {
     let mut tokens: Vec<Token> = Vec::new();
 
-    let lower_contents: String = contents.to_ascii_lowercase();
-    let chars: Vec<char> = lower_contents.chars().collect();
+    let chars: Vec<char> = contents.chars().collect();
 
     let mut idx: usize = 0;
     while idx < chars.len()
@@ -54,6 +55,11 @@ pub fn lex(contents: String) -> Vec<Token>
 
         if next.is_ascii_whitespace() || next.is_ascii_control()
         {
+            if next == '\n'
+            {
+                tokens.push(Token{key: GybeTkn::NEWLIN, value: temp_value});
+            }
+
             idx += 1;
             continue;
         }

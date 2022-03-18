@@ -36,7 +36,6 @@ pub fn get_arg_wrap_string(num_vars: u64) -> String
 pub fn get_begin_string() -> String
 {
     let begin_string: String = String::from("
-    #include <cassert>
     #include <inttypes.h>
     #include <iostream>
     #include <stack>
@@ -133,6 +132,18 @@ pub fn get_end_string() -> String
     ");
 
     return end_string;
+}
+
+pub fn get_label_string(num_labels: u64) -> String
+{
+    let mut label_string: String = String::new();
+
+    write!(label_string, "
+    }}
+    label{}:
+    ", num_labels).expect("get_label_string(u64) failed");
+
+    return label_string;
 }
 
 pub fn get_push_string(num_vars: u64) -> String
@@ -291,6 +302,26 @@ pub fn get_return_string() -> String
     return return_string;
 }
 
+pub fn get_skip_string(lbl: u64, ) -> String
+{
+    let mut skip_string: String = String::new();
+
+    write!(skip_string, "
+    if (stack.top().a.at(0) != 0)
+    {{
+        stack.pop();
+        goto label{};
+    }}
+    else
+    {{
+        stack.pop();
+    }}
+    {{
+    ", lbl).expect("get_skip_string(u64) failed");
+
+    return skip_string;
+}
+
 pub fn get_sum_string(num_vars: u64) -> String
 {
     let mut sum_string: String = String::new();
@@ -340,7 +371,6 @@ pub fn get_while_string() -> String
     let mut while_string: String = String::new();
     
     write!(while_string, "
-    assert(stack.top().a.size() == 1);
     while (stack.top().a.at(0) != 0)
     {{
     ").expect("get_while_string() failed");

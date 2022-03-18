@@ -18,6 +18,6 @@
 - product: pops then multiplies the top two values of the stack
 - quotient: pops then divides the top two values of the stack
 - remainder: pops the mods the top two values of the stack
-- (UNIMPLEMENTED) skip: skips x number of instructions if the top value of the stack is equal to zero
+- skip: pops a number and if that number is not zero skips x number of instructions
 - read: reads user input and pushes it onto the stack as a charms or charms array
 - give up: ends the program
