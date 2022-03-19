@@ -1,0 +1,25 @@
+This code is for a code translator to C++, written before the ALBWLTGY!BE interpreter was made. It has some bugs and will not
+be supported by the language creator.
+
+	Legacy ALBWLTGY!BE Specifications:
+
+        --::TYPES::--
+- bite represents an 8 bit integer or array of integers
+
+- charms represents a char or array of chars
+
+        --::COMMANDS::--
+- print: pops then prints the top value of the stack
+- comp: pops then compares the top two values of the stack if the top value is not an array. Pushes a zero if they are equal and a one if they are not
+- swap: swaps the top two values on the stack
+- loop: represents a while value != 0
+- end: ends the loop or subroutine
+- dup: duplicates the top value on the stack
+- sum: pops then adds the top two values of the stack
+- difference: pops then subtracts the top two values of the stack
+- product: pops then multiplies the top two values of the stack
+- quotient: pops then divides the top two values of the stack
+- remainder: pops the mods the top two values of the stack
+- skip: pops a number and if that number is not zero skips x number of instructions
+- read: reads user input and pushes it onto the stack as a charms or charms array
+- give up: ends the program

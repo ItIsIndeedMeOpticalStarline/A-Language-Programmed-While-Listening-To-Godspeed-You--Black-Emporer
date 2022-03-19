@@ -1,8 +1,8 @@
 use std::path::Path;
 
-mod c_code;
-mod translator;
+mod interpreter;
 mod lexer;
+mod parser;
 
 fn main() 
 {
@@ -21,31 +21,7 @@ fn main()
         return;
     }
 
-    let vec: std::vec::Vec<lexer::Token> = lexer::lex(contents.unwrap());
+    let tokens: Vec<lexer::Token> = lexer::lex(contents.unwrap());
 
-    let c_code: String = translator::translate(vec);
-
-    println!("\n{} successfully compiled!", file_path.display());
-    println!("Please enter an output path (Ex: C:\\Users\\Eve\\Desktop)\n");
-
-    let mut file_out: String = String::new();
-    std::io::stdin().read_line(&mut file_out).unwrap();
-    file_out = file_out.trim().to_string();
-
-    let file_name: &str = file_path.file_stem().unwrap_or(&std::ffi::OsStr::new("")).to_str().unwrap_or("");
-
-    let mut cpp_path: String = file_out.clone();
-    cpp_path.push_str("\\");
-    cpp_path.push_str(file_name);
-    cpp_path.push_str(".cpp");
-
-    let result: std::io::Result<()> = std::fs::write(&cpp_path, c_code);
-    if result.is_err()
-    {
-        println!("Unable to create file at {} ({})", cpp_path, result.unwrap_err());
-        return;
-    }
-
-    // This printing even if you fail is on purpose. Don't you dare delete it.
-    println!("\nEverything was successful. Good work!");
+    let commands: parser::Parsed = parser::parse(tokens);
 }
