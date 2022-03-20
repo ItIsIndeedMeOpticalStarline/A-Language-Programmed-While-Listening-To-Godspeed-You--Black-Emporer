@@ -14,13 +14,14 @@ pub enum ErrorType
 
 pub struct Parsed
 {
-    lines: u64,
-    call: Vec<interpreter::Command>
+    pub call: Vec<interpreter::Command>,
+    pub lines: u64,
+    pub run: bool
 }
 
 pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
 {
-    let mut result: Parsed = Parsed{lines:1, call:Vec::new()};
+    let mut result: Parsed = Parsed{call:Vec::new(), lines: 1, run: true};
     let mut expect: Vec<lexer::GybeTkn> = vec![lexer::GybeTkn::KEYWRD]; 
 
     let mut idx: usize = 0;
@@ -35,7 +36,8 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
 
         if !expect.contains(&tokens[idx].key)
         {
-            error_message(ErrorType::UNXPCT, &tokens[idx].value, result.lines)
+            error_message(ErrorType::UNXPCT, &tokens[idx].value, result.lines);
+            result.run = false;
         }
         expect.clear();
 
@@ -43,7 +45,8 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
         {
             lexer::GybeTkn::ILLEGL =>
             {
-                error_message(ErrorType::ILLEGL, &tokens[idx].value, result.lines)
+                error_message(ErrorType::ILLEGL, &tokens[idx].value, result.lines);
+                result.run = false;
             }
             lexer::GybeTkn::KEYWRD =>
             {
@@ -55,22 +58,22 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     }
                     "comp" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::CMP});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::CMP, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "difference" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::DIF});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::DIF, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "dup" => // PEEK 1 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::DUP});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::DUP, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "end" => // NONE
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::END});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::END, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "give" => // NONE
@@ -79,32 +82,32 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     }
                     "loop" => // PEEK 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::LOP});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::LOP, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "print" => // PEEK 1 POP 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::PRT});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::PRT, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "product" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::PCT});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::PCT, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "quotient" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::QUT});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::QUT, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "read" => // PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::RED});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::RED, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "remainder" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::REM});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::REM, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "skip" | "sub" => // ARG 1
@@ -113,22 +116,23 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     }
                     "sum" => // PEEK 2 POP 2 PUSH 1
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::SUM});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::SUM, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "swap" => // PEEK 2 POP 2 PUSH 2
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::SWP});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::SWP, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     "up" => // NONE
                     {
-                        result.call.push(interpreter::Command{arg: Vec::new(), func: interpreter::FuncTypes::PED});
+                        result.call.push(interpreter::Command{arg: interpreter::Arg{elm: Vec::new(), typ: interpreter::DataTypes::NONE}, func: interpreter::FuncTypes::PED, line: result.lines});
                         expect.push(lexer::GybeTkn::SPRATR);
                     }
                     _ =>
                     {
                         error_message(ErrorType::UNKNWN, &tokens[idx].value, result.lines);
+                        result.run = false;
 
                         expect.push(lexer::GybeTkn::KEYWRD);
                         expect.push(lexer::GybeTkn::LTERAL);
@@ -165,6 +169,7 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                                 {
                                     let val_str = chr.iter().collect();
                                     error_message(ErrorType::ILLEGL, &val_str, result.lines);
+                                    result.run = false;
                                 }
                                 val.push(*chr.first().expect("parser chr.first() function failed!") as u8);
                             }
@@ -174,7 +179,8 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                             }
                             _ =>
                             {
-                                error_message(ErrorType::UNKNWN, &tokens[idx - go_back + go_fore].value, result.lines)
+                                error_message(ErrorType::UNKNWN, &tokens[idx - go_back + go_fore].value, result.lines);
+                                result.run = false;
                             }
                         }
                     }
@@ -191,7 +197,8 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                             }
                         }
 
-                        error_message(ErrorType::UNXPCT, &tokens[idx + go_fore + 1].value, result.lines)
+                        error_message(ErrorType::UNXPCT, &tokens[idx + go_fore + 1].value, result.lines);
+                        result.run = false;
                     }
                     else if tokens[idx - go_back + go_fore].value == "\n" // Stil incrememnt lines because arrays can have line breaks
                     {
@@ -200,6 +207,7 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     else
                     {
                         error_message(ErrorType::UNXPCT, &tokens[idx + go_fore].value, result.lines);
+                        result.run = false;
                     }
 
                     go_fore += 1;
@@ -208,6 +216,7 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     {
                         let error_string: String = String::from("﹔"); // Missing errors feed the missing symbol instead of the problem symbol
                         error_message(ErrorType::MISSNG, &error_string, result.lines); 
+                        result.run = false;
                         break;
                     }
                 }
@@ -216,23 +225,24 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                 {
                     let error_string: String = String::from("");
                     error_message(ErrorType::NOVALU, &error_string, result.lines);
+                    result.run = false;
                 }
 
                 if tokens[idx - go_back].value == "bite"
                 {
-                    result.call.push(interpreter::Command{arg: val, func: interpreter::FuncTypes::BIT});
+                    result.call.push(interpreter::Command{arg: interpreter::Arg{elm: val, typ: interpreter::DataTypes::BITE}, func: interpreter::FuncTypes::BIT, line: result.lines});
                 }
                 else if tokens[idx - go_back].value == "charms"
                 {
-                    result.call.push(interpreter::Command{arg: val, func: interpreter::FuncTypes::CRM});
+                    result.call.push(interpreter::Command{arg: interpreter::Arg{elm: val, typ: interpreter::DataTypes::CHRM}, func: interpreter::FuncTypes::CRM, line: result.lines});
                 }
                 else if tokens[idx - go_back].value == "skip"
                 {
-                    result.call.push(interpreter::Command{arg: val, func: interpreter::FuncTypes::SKP});
+                    result.call.push(interpreter::Command{arg: interpreter::Arg{elm: val, typ: interpreter::DataTypes::BITE}, func: interpreter::FuncTypes::SKP, line: result.lines});
                 }
                 else // No need for else if because we know if it's not any of those it's sub
                 {
-                    result.call.push(interpreter::Command{arg: val, func: interpreter::FuncTypes::SUB});
+                    result.call.push(interpreter::Command{arg: interpreter::Arg{elm: val, typ: interpreter::DataTypes::CHRM}, func: interpreter::FuncTypes::SUB, line: result.lines});
                 }
                 
                 idx = idx - go_back + go_fore - 1; // Catch up from interior loop (-1 to stop before ﹔)
@@ -254,6 +264,7 @@ pub fn parse(tokens: Vec<lexer::Token>) -> Parsed
                     _ =>
                     {
                         error_message(ErrorType::UNKNWN, &tokens[idx].value, result.lines);
+                        result.run = false;
                     }
                 }
             }

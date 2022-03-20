@@ -21,7 +21,13 @@ fn main()
         return;
     }
 
-    let tokens: Vec<lexer::Token> = lexer::lex(contents.unwrap());
+    let commands: parser::Parsed = parser::parse(lexer::lex(contents.unwrap()));
 
-    let commands: parser::Parsed = parser::parse(tokens);
+    // Says this even if compilation fails
+    println!("\nParsed successfully! Now interpreting...\n");
+
+    if commands.run
+    {
+        interpreter::interpret(commands);    
+    }
 }
