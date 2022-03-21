@@ -270,14 +270,14 @@ pub fn interpret(commands: parser::Parsed)
                     if a.elm[0] as u8 != 0
                     {
                         lin_idx += commands.call[cmd_idx].arg.elm[0] as usize;
-                    }
 
-                    // Snap to the closest command to a given line number, rounded down
-                    while commands.call[cmd_idx].line as usize != lin_idx && 
-                    cmd_idx + 1 < commands.call.len() && 
-                    commands.call[cmd_idx + 1].line as usize  <= lin_idx
-                    {
-                        cmd_idx += 1;
+                        // Snap to the closest command to a given line number, rounded down
+                        while commands.call[cmd_idx].line as usize != lin_idx && 
+                        cmd_idx + 1 < commands.call.len() && 
+                        commands.call[cmd_idx + 1].line as usize  <= lin_idx
+                        {
+                            cmd_idx += 1;
+                        }
                     }
                 }
                 FuncTypes::SUB =>

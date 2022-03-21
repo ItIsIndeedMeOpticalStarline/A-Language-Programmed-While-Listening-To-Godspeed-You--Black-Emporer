@@ -74,9 +74,10 @@ loop﹔
 	
 	
 	
-	
 	charms 70. 105. 122. 122﹔
+	dup﹔
 	print﹔
+	skip 'f'﹔
 	
 	dup﹔
 	bite 'a'﹔bite 'f'﹔difference﹔
@@ -143,12 +144,42 @@ loop﹔
 	
 	
 	
-	
-	
 	charms 66. 117. 122. 122﹔
+	dup﹔
 	print﹔
+	skip ' '﹔
 	
 	dup﹔print﹔
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	charms 10﹔
 	print﹔
 	swap﹔
