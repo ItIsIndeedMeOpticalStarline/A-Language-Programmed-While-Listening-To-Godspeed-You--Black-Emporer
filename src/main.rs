@@ -52,4 +52,16 @@ fn main()
     {
         interpreter::interpret(commands);    
     }
+
+    println!("");
+
+    pause();
+}
+
+use std::io::prelude::*;
+fn pause() 
+{
+    write!(std::io::stdout(), "Press any key to continue...");
+    std::io::stdout().flush().unwrap();
+    let _i = std::io::stdin().read(&mut [0u8]).unwrap();    
 }
